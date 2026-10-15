@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Fragmentado</string>
+    <string name="titulo">Ejemplo de Fragmentos</string>
+    <string name="boton_uno">Fragmento 1</string>
+    <string name="boton_dos">Fragmento 2</string>
+    <string name="boton_tres">Fragmento 3</string>
+    <string name="texto_fragmento_uno">Este es el primer fragmento</string>
+    <string name="texto_fragmento_dos">Este es el segundo fragmento</string>
+    <string name="texto_fragmento_tres">Este es el tercer fragmento</string>
+</resources>
