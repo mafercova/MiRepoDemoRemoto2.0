@@ -5,33 +5,38 @@ const { MongoClient } = require('mongodb');
 
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
-const cluster = process.env.MONGODB_CLUSTER;
+const mongodbUri = process.env.MONGODB_URI;
 const databaseName = 'sample_mflix';
 
-function crearUriMongoDB(username, password) {
-    if (!cluster || !username || !password) {
-        throw new Error('Faltan variables de entorno de MongoDB');
+function validarMongoUri() {
+    if (!mongodbUri) {
+        throw new Error('Falta la variable de entorno MONGODB_URI. Defínela antes de iniciar el servidor.');
+    }
+}
+
+function crearUriMongoDBParaLogin(username, password) {
+    if (!username || !password) {
+        throw new Error('Usuario y contraseña son obligatorios');
     }
 
-    const normalizedCluster = cluster
-        .replace(/^mongodb\+srv:\/\//, '')
-        .replace(/\/$/, '');
+    validarMongoUri();
+    const uri = new URL(mongodbUri);
+    uri.username = username;
+    uri.password = password;
 
-    return `mongodb+srv://${encodeURIComponent(username)}:${encodeURIComponent(password)}@${normalizedCluster}/${databaseName}?authSource=admin&retryWrites=true&w=majority`;
+    return uri.toString();
 }
 
 async function conectarMongoDB() {
-    const client = new MongoClient(crearUriMongoDB(
-        process.env.MONGODB_USERNAME,
-        process.env.MONGODB_PASSWORD
-    ));
+    validarMongoUri();
+    const client = new MongoClient(mongodbUri);
 
     try {
         await client.connect();
         console.log("Conectado a MongoDB");
         return { client, db: client.db(databaseName) };
     } catch (error) {
-        console.error("Error en la conexión a MongoDB:", error);
+        console.error("Error en la conexión a MongoDB:", error.message);
         await client.close();
         throw error;
     }
@@ -50,7 +55,7 @@ app.post('/login', async (req, res) => {
     let client;
 
     try {
-        const loginClient = new MongoClient(crearUriMongoDB(username, password));
+        const loginClient = new MongoClient(crearUriMongoDBParaLogin(username, password));
         client = loginClient;
         await client.connect();
         await client.db(databaseName).command({ ping: 1 });
@@ -108,6 +113,7 @@ conectarMongoDB()
             console.log("Servidor en http://localhost:4000");
         });
     })
-    .catch(() => {
+    .catch((error) => {
+        console.error(error.message);
         process.exit(1);
     });
