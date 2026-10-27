@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+/ios
+/android
+
+# Metro and logs
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Local environment credentials
+.env
+.env.*
+!.env.example
